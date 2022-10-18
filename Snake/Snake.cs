@@ -35,11 +35,10 @@ sealed class Game
     private Point foodPos;
     private int score;
 
+    private Drawer drawer = new(new int[] { 1, 1 });
+
     //Holds reference to input listener thread.
     private readonly Thread inputHandler;
-
-    //Offset of the game window.
-    private readonly int[] bufferOffset = new int[] { 1, 1 };
 
     //Used to ensure only one key press is registered per game frame.
     private bool keyFrame = true;
@@ -93,35 +92,23 @@ sealed class Game
             }
         });
 
-    private void DrawPixel(int x, int y, ConsoleColor color, bool buffered)
-    {
-        int[] offset = buffered ? bufferOffset : new int[] { 0, 0 };
-        Console.BackgroundColor = color;
-        Console.SetCursorPosition((x + offset[0]) * 2, y + offset[1]);
-        Console.Write("  ");
-    }
-
-    private void DrawPixel(int x, int y, ConsoleColor color) =>
-        DrawPixel(x, y, color, true);
-
     private void DrawScore()
     {
         Console.BackgroundColor = ConsoleColor.Black;
-        Console.SetCursorPosition((width + bufferOffset[0] + 1) * 2, 0);
-        Console.Write($"Score: {score}");
+        drawer.DrawText((width + drawer.BufferOffset[0] + 1) * 2, 0, $"Score: {score}");
     }
 
     private void DrawBorders()
     {
         for (int i = 0; i < height + 1; i++)
         {
-            DrawPixel(width + 1, i, ConsoleColor.White, false);
-            DrawPixel(0, i, ConsoleColor.White, false);
+            drawer.DrawPixel(width + 1, i, ConsoleColor.White, false);
+            drawer.DrawPixel(0, i, ConsoleColor.White, false);
         }
         for (int i = 0; i < width + 2; i++)
         {
-            DrawPixel(i, height + 1, ConsoleColor.White, false);
-            DrawPixel(i, 0, ConsoleColor.White, false);
+            drawer.DrawPixel(i, height + 1, ConsoleColor.White, false);
+            drawer.DrawPixel(i, 0, ConsoleColor.White, false);
         }
         Console.BackgroundColor = ConsoleColor.Black;
     }
@@ -147,10 +134,10 @@ sealed class Game
         else
         {
             Point endPos = snake.Last!.Value;
-            DrawPixel(endPos.X, endPos.Y, ConsoleColor.Black);
+            drawer.DrawPixel(endPos.X, endPos.Y, ConsoleColor.Black);
             snake.RemoveLast();
         }
-        DrawPixel(newHead.X, newHead.Y, ConsoleColor.Red);
+        drawer.DrawPixel(newHead.X, newHead.Y, ConsoleColor.Red);
         keyFrame = true;
     }
 
@@ -175,7 +162,7 @@ sealed class Game
         } 
         while (snake.Contains(foodPos));
 
-        DrawPixel(foodPos.X, foodPos.Y, ConsoleColor.Green);
+        drawer.DrawPixel(foodPos.X, foodPos.Y, ConsoleColor.Green);
     }
 
     //Main thread driver.
