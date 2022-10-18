@@ -9,15 +9,15 @@ sealed class Game
 
     private readonly struct Point
     {
-        public readonly int x;
-        public readonly int y;
-        public Point(int x, int y)
+        public readonly int X;
+        public readonly int Y;
+        public Point(int X, int Y)
         {
-            this.x = x;
-            this.y = y;
+            this.X = X;
+            this.Y = Y;
         }
         public static Point operator +(Point p1, Point p2) =>
-            new Point(p1.x + p2.x, p1.y + p2.y);
+            new Point(p1.X + p2.X, p1.Y + p2.Y);
     }
 
     private readonly Dictionary<ConsoleKey, Point> directionMap = new()
@@ -76,14 +76,14 @@ sealed class Game
         {
             while (true)
             {
-                var t = Console.ReadKey(true).Key;
+                var key = Console.ReadKey(true).Key;
 
                 if (!keyFrame)
                     continue;
-                if (!directionMap.ContainsKey(t))
+                if (!directionMap.ContainsKey(key))
                     continue;
 
-                Point newDirection = directionMap[t];
+                Point newDirection = directionMap[key];
 
                 //Gaurds against opitist directions.
                 if ((newDirection + direction).Equals(new Point(0, 0)))
@@ -147,17 +147,17 @@ sealed class Game
         else
         {
             Point endPos = snake.Last!.Value;
-            DrawPixel(endPos.x, endPos.y, ConsoleColor.Black);
+            DrawPixel(endPos.X, endPos.Y, ConsoleColor.Black);
             snake.RemoveLast();
         }
-        DrawPixel(newHead.x, newHead.y, ConsoleColor.Red);
+        DrawPixel(newHead.X, newHead.Y, ConsoleColor.Red);
         keyFrame = true;
     }
 
     private bool CheckDeath(Point newHead)
     {
         bool checkBounds() =>
-            newHead.x < 0 || newHead.y < 0 || newHead.x >= width || newHead.y >= height;
+            newHead.X < 0 || newHead.Y < 0 || newHead.X >= width || newHead.Y >= height;
         if (snake.Contains(newHead) || checkBounds())
             return true;
         return false;
@@ -175,7 +175,7 @@ sealed class Game
         } 
         while (snake.Contains(foodPos));
 
-        DrawPixel(foodPos.x, foodPos.y, ConsoleColor.Green);
+        DrawPixel(foodPos.X, foodPos.Y, ConsoleColor.Green);
     }
 
     //Main thread driver.
