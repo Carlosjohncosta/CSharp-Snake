@@ -111,6 +111,7 @@ sealed class Game
         Console.SetCursorPosition((width + bufferOffset[0] + 1) * 2, 0);
         Console.Write($"Score: {score}");
     }
+
     private void DrawBorders()
     {
         for (int i = 0; i < height + 1; i++)
@@ -125,6 +126,7 @@ sealed class Game
         }
         Console.BackgroundColor = ConsoleColor.Black;
     }
+
     private void NextPos()
     {
         Point oldHead = snake.First!.Value;
