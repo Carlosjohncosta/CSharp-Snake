@@ -42,7 +42,7 @@ sealed class Game
     private readonly int[] bufferOffset = new int[] { 1, 1 };
 
     //Used to ensure only one key press is registered per game frame.
-    private bool KeyFrame = true;
+    private bool keyFrame = true;
 
     #endregion
 
@@ -54,16 +54,15 @@ sealed class Game
         Console.CursorVisible = false;
         inputHandler = GetInputHandler();
         inputHandler.Start();
-        Reset();
+        Setup();
         Driver();
     }
 
     public Game() : this(20, 20) { }
 
-    private void Reset()
+    private void Setup()
     {
         score = 0;
-        Console.BackgroundColor = ConsoleColor.Black;
         Console.Clear();
         DrawBorders();
         snake.Clear();
@@ -79,7 +78,7 @@ sealed class Game
             {
                 var t = Console.ReadKey(true).Key;
 
-                if (!KeyFrame)
+                if (!keyFrame)
                     continue;
                 if (!directionMap.ContainsKey(t))
                     continue;
@@ -90,7 +89,7 @@ sealed class Game
                 if ((newDirection + direction).Equals(new Point(0, 0)))
                     continue;
                 direction = newDirection;
-                KeyFrame = false;
+                keyFrame = false;
             }
         });
 
@@ -136,7 +135,7 @@ sealed class Game
             Console.SetCursorPosition(width / 2, height / 2);
             Console.Write("You Have Died!!");
             Console.ReadKey();
-            Reset();
+            Setup();
             return;
         }
         snake.AddFirst(newHead);
@@ -152,7 +151,7 @@ sealed class Game
             snake.RemoveLast();
         }
         DrawPixel(newHead.x, newHead.y, ConsoleColor.Red);
-        KeyFrame = true;
+        keyFrame = true;
     }
 
     private bool CheckDeath(Point newHead)
