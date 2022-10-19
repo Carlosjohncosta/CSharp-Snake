@@ -2,25 +2,25 @@
 
 internal class Drawer
 {
-    public readonly int[] BufferOffset = new int[] { 1, 1 };
+    public readonly Point BufferOffset;
 
-    public Drawer(int[] bufferOffset)
+    public Drawer(Point bufferOffset)
     {
         this.BufferOffset = bufferOffset;
     }
 
     public void DrawPixel(int x, int y, ConsoleColor color, bool buffered)
     {
-        int[] offset = buffered ? BufferOffset : new int[] { 0, 0 };
+        Point offset = buffered ? BufferOffset : new Point(0, 0);
         Console.BackgroundColor = color;
-        Console.SetCursorPosition((x + offset[0]) * 2, y + offset[1]);
+        Console.SetCursorPosition((x + offset.X) * 2, y + offset.Y);
         Console.Write("  ");
     }
 
     public void DrawPixel(int x, int y, ConsoleColor color) =>
         DrawPixel(x, y, color, true);
 
-    public void DrawText(int x, int y, string text)
+    public static void DrawText(int x, int y, string text)
     {
         Console.SetCursorPosition(x, y);
         Console.Write(text);

@@ -7,20 +7,7 @@ sealed class Game
 
     #region Declarations
 
-    private readonly struct Point
-    {
-        public readonly int X;
-        public readonly int Y;
-        public Point(int X, int Y)
-        {
-            this.X = X;
-            this.Y = Y;
-        }
-        public static Point operator +(Point p1, Point p2) =>
-            new Point(p1.X + p2.X, p1.Y + p2.Y);
-    }
-
-    private readonly Dictionary<ConsoleKey, Point> directionMap = new()
+    private readonly Dictionary<ConsoleKey, Point> _directionMap = new()
     {
         { ConsoleKey.LeftArrow, new Point(-1, 0) },
         { ConsoleKey.RightArrow, new Point(1, 0) },
@@ -28,31 +15,30 @@ sealed class Game
         { ConsoleKey.DownArrow, new Point(0, 1) }
     };
 
-    private readonly int width;
-    private readonly int height;
-    private readonly LinkedList<Point> snake = new();
-    private Point direction = new Point(0, 1);
-    private Point foodPos;
-    private int score;
-
-    private Drawer drawer = new(new int[] { 1, 1 });
+    private readonly int _width;
+    private readonly int _height;
+    private readonly LinkedList<Point> _snake = new();
+    private Point _direction = new(0, 1);
+    private Point _foodPos;
+    private int _score;
+    private readonly Drawer _drawer = new(new Point(1, 1));
 
     //Holds reference to input listener thread.
-    private readonly Thread inputHandler;
+    private readonly Thread _inputHandler;
 
     //Used to ensure only one key press is registered per game frame.
-    private bool keyFrame = true;
+    private bool _keyFrame = true;
 
     #endregion
 
     public Game(int width, int height)
     {
-        this.width = width;
-        this.height = height;
+        _width = width;
+        _height = height;
         Console.Title = "Snake";
         Console.CursorVisible = false;
-        inputHandler = GetInputHandler();
-        inputHandler.Start();
+        _inputHandler = GetInputHandler();
+        _inputHandler.Start();
         Setup();
         Driver();
     }
@@ -61,11 +47,11 @@ sealed class Game
 
     private void Setup()
     {
-        score = 0;
+        _score = 0;
         Console.Clear();
         DrawBorders();
-        snake.Clear();
-        snake.AddFirst(new Point(width / 2, height / 2));
+        _snake.Clear();
+        _snake.AddFirst(new Point(_width / 2, _height / 2));
         NewFood();
     }
 
@@ -77,75 +63,80 @@ sealed class Game
             {
                 var key = Console.ReadKey(true).Key;
 
-                if (!keyFrame)
+                if (key == ConsoleKey.Escape)
+                {
+                    Console.Clear();
+                    Environment.Exit(0);
+                }
+                if (!_keyFrame)
                     continue;
-                if (!directionMap.ContainsKey(key))
+                if (!_directionMap.ContainsKey(key))
                     continue;
 
-                Point newDirection = directionMap[key];
+                Point newDirection = _directionMap[key];
 
                 //Gaurds against opitist directions.
-                if ((newDirection + direction).Equals(new Point(0, 0)))
+                if ((newDirection + _direction).Equals(new Point(0, 0)))
                     continue;
-                direction = newDirection;
-                keyFrame = false;
+                _direction = newDirection;
+                _keyFrame = false;
             }
         });
 
     private void DrawScore()
     {
         Console.BackgroundColor = ConsoleColor.Black;
-        drawer.DrawText((width + drawer.BufferOffset[0] + 1) * 2, 0, $"Score: {score}");
+        Drawer.DrawText((_width + _drawer.BufferOffset.X + 1) * 2, 0, $"Score: {_score}");
     }
 
     private void DrawBorders()
     {
-        for (int i = 0; i < height + 1; i++)
+        for (int i = 0; i < _height + 1; i++)
         {
-            drawer.DrawPixel(width + 1, i, ConsoleColor.White, false);
-            drawer.DrawPixel(0, i, ConsoleColor.White, false);
+            _drawer.DrawPixel(_width + 1, i, ConsoleColor.White, false);
+            _drawer.DrawPixel(0, i, ConsoleColor.White, false);
         }
-        for (int i = 0; i < width + 2; i++)
+        for (int i = 0; i < _width + 2; i++)
         {
-            drawer.DrawPixel(i, height + 1, ConsoleColor.White, false);
-            drawer.DrawPixel(i, 0, ConsoleColor.White, false);
+            _drawer.DrawPixel(i, _height + 1, ConsoleColor.White, false);
+            _drawer.DrawPixel(i, 0, ConsoleColor.White, false);
         }
         Console.BackgroundColor = ConsoleColor.Black;
     }
 
     private void NextPos()
     {
-        Point oldHead = snake.First!.Value;
-        Point newHead = oldHead + direction;
+        Point oldHead = _snake.First!.Value;
+        Point newHead = oldHead + _direction;
         if (CheckDeath(newHead))
         {
-            Console.SetCursorPosition(width / 2, height / 2);
+            Console.SetCursorPosition(_width / 2, _height / 2);
             Console.Write("You Have Died!!");
             Console.ReadKey();
             Setup();
             return;
         }
-        snake.AddFirst(newHead);
-        if (newHead.Equals(foodPos))
+        _snake.AddFirst(newHead);
+        if (newHead.Equals(_foodPos))
         {
-            score++;
+            _score++;
             NewFood();
         }
         else
         {
-            Point endPos = snake.Last!.Value;
-            drawer.DrawPixel(endPos.X, endPos.Y, ConsoleColor.Black);
-            snake.RemoveLast();
+            Point endPos = _snake.Last!.Value;
+            _drawer.DrawPixel(endPos.X, endPos.Y, ConsoleColor.Black);
+            _snake.RemoveLast();
         }
-        drawer.DrawPixel(newHead.X, newHead.Y, ConsoleColor.Red);
-        keyFrame = true;
+        _drawer.DrawPixel(newHead.X, newHead.Y, ConsoleColor.Red);
+        _keyFrame = true;
     }
 
     private bool CheckDeath(Point newHead)
     {
         bool checkBounds() =>
-            newHead.X < 0 || newHead.Y < 0 || newHead.X >= width || newHead.Y >= height;
-        if (snake.Contains(newHead) || checkBounds())
+            newHead.X < 0 || newHead.Y < 0 || newHead.X >= _width || newHead.Y >= _height;
+        if (_snake.Contains(newHead) || checkBounds())
             return true;
         return false;
     }
@@ -158,11 +149,11 @@ sealed class Game
         //Will cause game to lock if no pos is available, but I dont really care.
         do
         {
-            foodPos = new(rand.Next(width), rand.Next(height));
+            _foodPos = new(rand.Next(_width), rand.Next(_height));
         } 
-        while (snake.Contains(foodPos));
+        while (_snake.Contains(_foodPos));
 
-        drawer.DrawPixel(foodPos.X, foodPos.Y, ConsoleColor.Green);
+        _drawer.DrawPixel(_foodPos.X, _foodPos.Y, ConsoleColor.Green);
     }
 
     //Main thread driver.
@@ -172,7 +163,7 @@ sealed class Game
         {
             NextPos();
             DrawScore();
-            Thread.Sleep(100);
+            Thread.Sleep(130);
         }
     }
 }
