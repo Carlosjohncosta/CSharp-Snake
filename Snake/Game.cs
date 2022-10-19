@@ -36,7 +36,6 @@ sealed class Game
         _width = width;
         _height = height;
         Console.Title = "Snake";
-        Console.CursorVisible = false;
         _inputHandler = GetInputHandler();
         _inputHandler.Start();
         Setup();
@@ -65,6 +64,7 @@ sealed class Game
 
                 if (key == ConsoleKey.Escape)
                 {
+                    Console.CursorVisible = true;
                     Console.Clear();
                     Environment.Exit(0);
                 }
@@ -75,7 +75,7 @@ sealed class Game
 
                 Point newDirection = _directionMap[key];
 
-                //Gaurds against opitist directions.
+                //Guards against opposite directions.
                 if ((newDirection + _direction).Equals(new Point(0, 0)))
                     continue;
                 _direction = newDirection;
@@ -135,7 +135,11 @@ sealed class Game
     private bool CheckDeath(Point newHead)
     {
         bool checkBounds() =>
-            newHead.X < 0 || newHead.Y < 0 || newHead.X >= _width || newHead.Y >= _height;
+            newHead.X < 0 || 
+            newHead.Y < 0 || 
+            newHead.X >= _width || 
+            newHead.Y >= _height;
+
         if (_snake.Contains(newHead) || checkBounds())
             return true;
         return false;
@@ -161,6 +165,8 @@ sealed class Game
     {
         while (true)
         {
+            //This is set to false each frame as changing window size will make cursor visible if not.
+            Console.CursorVisible = false;
             NextPos();
             DrawScore();
             Thread.Sleep(130);

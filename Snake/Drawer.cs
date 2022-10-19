@@ -1,6 +1,6 @@
 ﻿namespace Snake;
 
-internal class Drawer
+sealed class Drawer
 {
     public readonly Point BufferOffset;
 
