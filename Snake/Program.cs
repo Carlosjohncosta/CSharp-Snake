@@ -2,7 +2,7 @@
 
 sealed class Program
 {
-    public static void Main(string[] args)
+    private static void Main(string[] args)
     {
         if (args.Length == 0)
             _ = new Game();
@@ -14,9 +14,7 @@ sealed class Program
             _ = new Game(width, height);
     }
 
-    private static void Error()
-    {
+    private static void Error() =>
         throw new Exception("Args should be 2 numbers (width and height of game), " +
                     "or no args should be passed.");
-    }
-} 
+}
