@@ -4,10 +4,8 @@ sealed class Drawer
 {
     public readonly Point BufferOffset;
 
-    public Drawer(Point bufferOffset)
-    {
-        this.BufferOffset = bufferOffset;
-    }
+    public Drawer(Point BufferOffset) =>
+        this.BufferOffset = BufferOffset;
 
     public void DrawPixel(int x, int y, ConsoleColor color, bool buffered)
     {

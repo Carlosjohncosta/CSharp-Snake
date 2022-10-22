@@ -1,6 +1,6 @@
 ﻿namespace Snake;
 
-// Created by Carlos Costa, October 2022.
+//Created by Carlos Costa, October 2022.
 
 sealed class Game
 {
@@ -76,7 +76,7 @@ sealed class Game
                 Point newDirection = _directionMap[key];
 
                 //Guards against opposite directions.
-                if ((newDirection + _direction).Equals(new Point(0, 0)))
+                if (!(newDirection + _direction))
                     continue;
                 _direction = newDirection;
                 _keyFrame = false;
@@ -140,9 +140,7 @@ sealed class Game
             newHead.X >= _width || 
             newHead.Y >= _height;
 
-        if (_snake.Contains(newHead) || checkBounds())
-            return true;
-        return false;
+        return _snake.Contains(newHead) || checkBounds();
     }
 
     private void NewFood()
