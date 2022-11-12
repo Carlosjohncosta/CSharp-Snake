@@ -7,4 +7,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\Users\carlo\source\repos\Snake\Snake\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="C:\Users\carlo\source\repos\Snake\Snake\.editorconfig" />
+  </ItemGroup>
+
 </Project>

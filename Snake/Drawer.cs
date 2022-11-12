@@ -2,25 +2,25 @@
 
 sealed class Drawer
 {
-    public readonly Point BufferOffset;
+    public Point BufferOffset { get; }
 
     public Drawer(Point BufferOffset) =>
         this.BufferOffset = BufferOffset;
 
-    public void DrawPixel(int x, int y, ConsoleColor color, bool buffered)
+    public void DrawPixel(Point point, ConsoleColor color, bool buffered)
     {
-        Point offset = buffered ? BufferOffset : new Point(0, 0);
+        Point offset = buffered ? BufferOffset : new(0, 0);
         Console.BackgroundColor = color;
-        Console.SetCursorPosition((x + offset.X) * 2, y + offset.Y);
+        Console.SetCursorPosition((point.X + offset.X) * 2, point.Y + offset.Y);
         Console.Write("  ");
     }
 
-    public void DrawPixel(int x, int y, ConsoleColor color) =>
-        DrawPixel(x, y, color, true);
+    public void DrawPixel(Point point, ConsoleColor color) =>
+        DrawPixel(point, color, true);
 
-    public static void DrawText(int x, int y, string text)
+    public static void DrawText(Point point, string text)
     {
-        Console.SetCursorPosition(x, y);
+        Console.SetCursorPosition(point.X, point.Y);
         Console.Write(text);
     }
 }

@@ -8,9 +8,13 @@ sealed class Program
             _ = new Game();
         else if (args.Length > 2 || args.Length == 1)
             Error();
-        else if (!(Int32.TryParse(args[0], out Int32 width) && Int32.TryParse(args[1], out Int32 height)))
+        else if (
+            !(Int32.TryParse(args[0], out Int32 width) &&
+            Int32.TryParse(args[1], out Int32 height)))
+        {
             Error();
-        else 
+        }
+        else
             _ = new Game(width, height);
     }
 

@@ -2,8 +2,8 @@
 
 readonly struct Point
 {
-    public readonly int X;
-    public readonly int Y;
+    public int X { get; }
+    public int Y { get; }
     public Point(int X, int Y)
     {
         this.X = X;
