@@ -23,6 +23,7 @@ sealed class Game
     private Point _foodPos;
     private int _score;
     private readonly Drawer _drawer = new(new Point(1, 1));
+    private bool _running = true;
 
     //Holds reference to input listener thread.
     private readonly Thread _inputHandler;
@@ -60,19 +61,12 @@ sealed class Game
     private Thread GetInputHandler() =>
         new(() =>
         {
-            static void exit()
-            {
-                Console.CursorVisible = true;
-                Console.Clear();
-                Environment.Exit(0);
-            }
-
-            while (true)
+            while (_running)
             {
                 var key = Console.ReadKey(true).Key;
 
                 if (key == ConsoleKey.Escape)
-                    exit();
+                    _running = false;
                 if (!_keyFrame)
                     continue;
                 if (!_directionMap.ContainsKey(key))
@@ -170,7 +164,7 @@ sealed class Game
     //Main thread driver.
     private void Driver()
     {
-        while (true)
+        while (_running)
         {
             /* Console.CursorVisible is set to false each frame as 
              * changing window size will make cursor visible if not.
@@ -180,5 +174,10 @@ sealed class Game
             DrawScore();
             Thread.Sleep(130);
         }
+
+        //Resets console on exit.
+        Console.CursorVisible = true;
+        Console.Clear();
+        Environment.Exit(0);
     }
 }
