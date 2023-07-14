@@ -4,16 +4,15 @@
 
 sealed class Game
 {
-
     #region Declarations
 
     //Maps key presses to direction.
     private readonly Dictionary<ConsoleKey, Point> _directionMap = new()
     {
-        { ConsoleKey.LeftArrow, new Point(-1, 0) },
-        { ConsoleKey.RightArrow, new Point(1, 0) },
-        { ConsoleKey.UpArrow, new Point(0, -1) },
-        { ConsoleKey.DownArrow, new Point(0, 1) }
+        { ConsoleKey.LeftArrow, new(-1, 0) },
+        { ConsoleKey.RightArrow, new(1, 0) },
+        { ConsoleKey.UpArrow, new(0, -1) },
+        { ConsoleKey.DownArrow, new(0, 1) }
     };
 
     private readonly int _width;
@@ -22,7 +21,10 @@ sealed class Game
     private Point _direction;
     private Point _foodPos;
     private int _score;
+    private int _gameSpeed = 120;
     private readonly Drawer _drawer = new(new Point(1, 1));
+
+    //Program exits once set to false.
     private bool _running = true;
 
     //Holds reference to input listener thread.
@@ -33,7 +35,7 @@ sealed class Game
 
     #endregion
 
-    public Game(int width, int height)
+    public Game(int width = 20, int height = 20)
     {
         _width = width;
         _height = height;
@@ -43,8 +45,6 @@ sealed class Game
         Setup();
         Driver();
     }
-
-    public Game() : this(20, 20) { }
 
     private void Setup()
     {
@@ -66,10 +66,11 @@ sealed class Game
                 var key = Console.ReadKey(true).Key;
 
                 if (key == ConsoleKey.Escape)
+                {
                     _running = false;
-                if (!_keyFrame)
-                    continue;
-                if (!_directionMap.ContainsKey(key))
+                    return;
+                }
+                if (!_keyFrame || !_directionMap.ContainsKey(key))
                     continue;
 
                 Point newDirection = _directionMap[key];
@@ -77,7 +78,7 @@ sealed class Game
                 /* Guards against opposite directions.
                  * If current direction + new Direction == (0, 0), they must be oppisite.
                  */
-                if (!(newDirection + _direction))
+                if ((newDirection + _direction) == new Point(0, 0))
                     continue;
                 _direction = newDirection;
                 _keyFrame = false;
@@ -87,7 +88,7 @@ sealed class Game
     private void DrawScore()
     {
         Console.BackgroundColor = ConsoleColor.Black;
-        var position = new Point((_width + _drawer.BufferOffset.X + 1) * 2, 0);
+        Point position = new((_width + _drawer.BufferOffset.X + 1) * 2, 0);
         Drawer.DrawText(position, $"Score: {_score}");
     }
 
@@ -134,16 +135,12 @@ sealed class Game
         _keyFrame = true;
     }
 
-    private bool CheckDeath(Point newHead)
-    {
-        bool checkBounds() =>
-            newHead.X < 0 || 
-            newHead.Y < 0 || 
-            newHead.X >= _width || 
-            newHead.Y >= _height;
-
-        return _snake.Contains(newHead) || checkBounds();
-    }
+    private bool CheckDeath(Point newHead) =>
+        _snake.Contains(newHead)
+        || newHead.X < 0
+        || newHead.Y < 0
+        || newHead.X >= _width
+        || newHead.Y >= _height;
 
     private void NewFood()
     {
@@ -172,12 +169,11 @@ sealed class Game
             Console.CursorVisible = false;
             NextPos();
             DrawScore();
-            Thread.Sleep(130);
+            Thread.Sleep(_gameSpeed);
         }
 
         //Resets console on exit.
         Console.CursorVisible = true;
         Console.Clear();
-        Environment.Exit(0);
     }
 }
